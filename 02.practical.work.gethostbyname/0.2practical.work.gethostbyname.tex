@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\title{Practical Work 2}
+\author {Hong Hanh}
+\date{20 March 2019}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+
+\begin{document}
+
+\maketitle
+
+\begin{itemize}
+    \item C program using \textbf{gethostbyname()} to resolve a domain name:
+    \begin{verbatim}
+	#include<stdio.h>
+	#include<netdb.h>
+	#include<arpa/inet.h>
+	
+	int main(){	
+		char str[100];
+		//Input
+		printf("%s\n", " Please enter domain name:");
+		scanf("%s", str);
+		//Gethostbyname
+		struct hostent *host_name = gethostbyname(str);
+		//Output
+		printf("%s\n", " IP address result:");
+		struct in_addr **ip_addr ;
+		ip_addr = (struct in_addr **)host_name->h_addr_list;
+		for (int i=0;ip_addr[i] != NULL; i++){
+			printf("%s\n", inet_ntoa(*ip_addr[i]));
+		}
+	}
+    \end{verbatim}
+	\item Results:
+    \begin{verbatim}
+	root@Hanh: gcc -o 02.practical.work.gethostbyname 02.practical.work.gethostbyname.c
+	root@Hanh:./02.practical.work.gethostbyname
+	 Please enter domain name:
+	usth.edu.vn
+	 IP address result:
+	104.27.161.15
+	104.27.160.15
+	root@Hanh:./02.practical.work.gethostbyname
+	 Please enter domain name:
+	facebook.com.vn
+	 IP address result:
+	112.213.89.38
+	root@Hanh:./02.practical.work.gethostbyname
+	 Please enter domain name:
+	google.com
+	 IP address result:
+	172.217.24.206
+    \end{verbatim}
+\end{itemize}
+
+\end{document}
