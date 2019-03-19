@@ -2,16 +2,19 @@
 #include<netdb.h>
 #include<arpa/inet.h>
 
-int main(){
-	
-	char str[100];
+int main(int argc, char **argv){
+	struct hostent *host_name;
 	//Input
-	printf("%s\n", " Please enter domain name:");
-	scanf("%s", str);
-
-    //Gethostbyname
-	struct hostent *host_name = gethostbyname(str);
-
+	if(argc == 2) {
+		host_name = gethostbyname(argv[1]);
+	}
+	else
+	{
+		printf("%s\n", " Please enter domain name:");
+		char str[100];
+		scanf("%s", str);
+		host_name = gethostbyname(str);
+	}
 
 	//Output
 	printf("%s\n", " IP address result:");
@@ -22,3 +25,4 @@ int main(){
 		printf("%s\n", inet_ntoa(*ip_addr[i]));
 	}
 }
+
