@@ -49,5 +49,9 @@ int main( int argc , char*argv[]) {
 		perror("Cannot connect\n");
 		return -1;
 	}
+    else
+    {
+        printf("Sucessfully connected!");
+    }
 	return 0;
 }
