@@ -38,15 +38,22 @@ int main( int argc , char*argv[]) {
 	if ((sockfd=socket(AF_INET, SOCK_STREAM, 0)) < 0) 
     {
 		perror("Error creating socket\n");
+        close(sockfd);
 		return -1;
 	}
 	memset(&saddr, 0, sizeof(saddr));
 	saddr.sin_family = AF_INET;
 	memcpy((char *) &saddr.sin_addr.s_addr, h->h_addr_list[0], h->h_length);
-	saddr.sin_port = htons(port);
+    
+    struct in_addr **bo = (struct in_addr **)h->h_addr_list;
+	struct in_addr hanh = *bo[0];
+	printf("%s\n", inet_ntoa(hanh));
+
+    saddr.sin_port = htons(port);
 	if (connect(sockfd, (struct sockaddr *) &saddr, sizeof(saddr)) < 0) 
     {
 		perror("Cannot connect\n");
+        close(sockfd);
 		return -1;
 	}
     else
