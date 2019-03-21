@@ -50,11 +50,11 @@ int main()
             }
 
             printf("Server: ");
-            scanf("%[^\n]%*c", mess);
+            fgets(mess, sizeof mess, stdin);
             
             if(strcmp(mess,"/dc") == 0){
                 close(clientfd);
-                return -1;
+                break;
             }
             write(clientfd, mess, sizeof(mess));
         }

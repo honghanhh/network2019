@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <fcntl.h>
 
 int main(int argc, char *argv[])
 {
@@ -68,7 +69,7 @@ int main(int argc, char *argv[])
         printf("Client: ");
         fgets(mess, sizeof mess, stdin);
         printf("Input msg '%s'", mess);
-        if (strcmp(mess,"xinh") == 0 || strcmp(mess,"xinh\n") == 0 )
+        if (strcmp(mess,"/quit") == 0 || strcmp(mess,"quit\n") == 0 )
         {
             shutdown(sockfd, SHUT_RDWR);
             close(sockfd); //terminate
