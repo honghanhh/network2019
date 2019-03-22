@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <poll.h>
 
 int main()
 {
@@ -16,6 +18,11 @@ int main()
         printf("Error creating socket\n");
         return -1;
     }
+
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int));
+    int fl = fcntl(sockfd, F_GETFL, 0);
+    fl |= O_NONBLOCK;
+    fcntl(sockfd, F_SETFL, fl);
 
     memset(&saddr, 0, sizeof(saddr));
     saddr.sin_family = AF_INET;
@@ -37,33 +44,33 @@ int main()
     while (1)
     {
         clen = sizeof(caddr);
-        if ((clientfd = accept(sockfd, (struct sockaddr *)&caddr, &clen)) < 0)
+        if ((clientfd = accept(sockfd, (struct sockaddr *)&caddr, &clen)) <= 0)
         {
-            printf("Error accepting connection\n");
+            // printf("Error accepting connection\n");
+            continue;
         }
+
+        int fl = fcntl(clientfd, F_GETFL, 0);
+        fl |= O_NONBLOCK;
+        fcntl(clientfd, F_SETFL, fl);
 
         while (1)
         {
             memset(mess, 0, sizeof mess);
-            if (read(clientfd, mess, sizeof(mess)) <= 0)
+            if (read(clientfd, mess, sizeof(mess)) > 0)
             {
-                printf("Client disconnected.\n");
-                break;
+                printf("Client: %s\n", mess);
             }
-            printf("Client: %s\n", mess);
 
-            memset(mess, 0, sizeof mess);
-            printf("Server: ");
-            fgets(mess, sizeof mess, stdin);
-            mess[strlen(mess) - 1] = 0;
-
-            if (strcmp(mess, "/dc") == 0)
+            struct pollfd input[1] = {{.fd = 0, .events = POLLIN}};
+            if (poll(input, 1, 100) > 0)
             {
-                shutdown(clientfd, SHUT_RDWR);
-                close(clientfd);
-                break;
+                // printf("Server: ");
+                fgets(mess, sizeof mess, stdin);
+                mess[strlen(mess) - 1] = 0;
+
+                write(clientfd, mess, strlen(mess));
             }
-            write(clientfd, mess, strlen(mess));
         }
     }
 }

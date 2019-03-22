@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
+#include <poll.h>
 
 int main(int argc, char *argv[])
 {
@@ -63,31 +64,26 @@ int main(int argc, char *argv[])
         printf("Sucessfully connected!\n");
     }
 
+    int fl = fcntl(sockfd, F_GETFL, 0);
+    fl |= O_NONBLOCK;
+    fcntl(sockfd, F_SETFL, fl);
+
     while (1)
     {
-        memset(mess, 0, sizeof mess);
-        printf("Client: ");
-        fgets(mess, sizeof mess, stdin);
-        mess[strlen(mess) - 1] = 0;
-        if (strcmp(mess, "/quit") == 0)
-        {
-            printf("Client disconnecting ...\n");
-            shutdown(sockfd, SHUT_RDWR);
-            close(sockfd); //terminate
-            return 0;
-        }
-
-        write(sockfd, mess, strlen(mess));
-
         memset(mess, 0, sizeof mess);
         if (read(sockfd, mess, sizeof(mess)) > 0)
         {
             printf("Server: %s\n", mess);
         }
-        else
+
+        struct pollfd input[1] = {{.fd = 0, .events = POLLIN}};
+        if (poll(input, 1, 100) > 0)
         {
-            printf("Server disconnected.\n");
-            break;
+            // printf("Client: ");
+            fgets(mess, sizeof mess, stdin);
+            mess[strlen(mess) - 1] = 0;
+
+            write(sockfd, mess, strlen(mess));
         }
     }
 }
