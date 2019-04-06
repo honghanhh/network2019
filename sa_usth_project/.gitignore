@@ -1,8 +1,6 @@
 map
 reduce
 .vscode/ipch
-client
-server
 daemon
 split
 launch
